@@ -13,6 +13,10 @@ type Fake struct {
 	w io.Writer
 }
 
+func NewProvider(w io.Writer) mailx.Provider {
+	return &Fake{w}
+}
+
 var tmpl = template.Must(template.New("mailx/fake").Parse(
 	`FROM: {{.From}}
 TO: {{.To}}
