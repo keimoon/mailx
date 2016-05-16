@@ -41,7 +41,9 @@ type Message struct {
 }
 
 func NewMessage() *Message {
-	return &Message{}
+	return &Message{
+		headers: make(map[string][]string),
+	}
 }
 
 func NewSimpleMessage(fromName, fromEmail, to, subject, text string) *Message {
@@ -80,6 +82,10 @@ func (m *Message) AddBCC(bcc string) *Message {
 	return m
 }
 
+func (m *Message) BCC() []string {
+	return m.bcc
+}
+
 func (m *Message) SetSubject(subject string) *Message {
 	m.subject = subject
 	return m
@@ -107,7 +113,7 @@ func (m *Message) HTML() string {
 	return m.html
 }
 
-func (m *Message) AddAtachment(name, mime string, body io.ReadCloser) *Message {
+func (m *Message) AddAtachment(name, mime string, body io.Reader) *Message {
 	m.attachments = append(m.attachments, NewAttachment(name, mime, body))
 	return m
 }
@@ -116,7 +122,7 @@ func (m *Message) Attachments() []*Attachment {
 	return m.attachments
 }
 
-func (m *Message) AddInline(name, mime string, body io.ReadCloser) *Message {
+func (m *Message) AddInline(name, mime string, body io.Reader) *Message {
 	m.inlines = append(m.inlines, NewAttachment(name, mime, body))
 	return m
 }
@@ -155,16 +161,16 @@ func (n *NameAndEmail) String() string {
 	if n.name == "" {
 		return n.email
 	}
-	return n.name + "<" + n.email + ">"
+	return n.name + " <" + n.email + ">"
 }
 
 type Attachment struct {
 	name string
 	mime string
-	body io.ReadCloser
+	body io.Reader
 }
 
-func NewAttachment(name, mime string, body io.ReadCloser) *Attachment {
+func NewAttachment(name, mime string, body io.Reader) *Attachment {
 	return &Attachment{name, mime, body}
 }
 
@@ -176,6 +182,6 @@ func (a *Attachment) Mime() string {
 	return a.mime
 }
 
-func (a *Attachment) Body() io.ReadCloser {
+func (a *Attachment) Body() io.Reader {
 	return a.body
 }
